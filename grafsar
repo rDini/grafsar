@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Script created by rDini
+
+#:::::::::  FUNCTIONS
+
+Blanklines(){
+	blankblank=grep -n '^ *$' $location_sar | sed -e 's/://'
+	echo blankDone
+}
+
+MemSar(){
+	blankblank[]=$(grep -n '^ *$' $location_sar | sed -e 's/://')
+	echo $blankblank
+	line_numb=$(grep -n 'kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit' $location_sar | awk -F : '{print $1}')
+	echo $ine_numb
+	var1=$(grep -n $line_numb-1 $blankblank)
+	echo $var1
+	nextline= $(sed -n $var1+1 $blankblank)
+	echo $nextline
+	
+}
+
+
+
+
+# Execute getopt on the arguments passed to this program, identified by the special character $@
+PARSED_OPTIONS=$(getopt -n "$0"  -o hm2f: --long "help,memory,two,file:"  -- "$@")
+ 
+#Bad arguments, something has gone wrong with the getopt command.
+if [ $? -ne 0 ];
+then
+  exit 1
+fi
+ 
+# A little magic, necessary when using getopt.
+eval set -- "$PARSED_OPTIONS"
+ 
+ 
+# Now goes through all the options with a case and using shift to analyse 1 argument at a time.
+#$1 identifies the first argument, and when we use shift we discard the first argument, so $2 becomes $1 and goes again through the case.
+while true;
+do
+  case "$1" in
+ 
+    -h|--help)
+      echo "usage $0 -h -1 -2 -3 or $0 --help --one --two --three"
+     shift;;
+ 
+    -m|--memory)
+      MemSar
+      shift;;
+ 
+    -2|--two)
+      echo "Dos"
+      shift;;
+ 
+    -f|--file)
+#      echo "tre"
+ 
+      # We need to take the option of the argument "three"
+      if [ -n "$2" ];
+      then
+        location_sar=$2
+	echo "file is at $2"
+      fi
+      shift 2;;
+ 
+    --)
+      shift
+      break;;
+  esac
+done
