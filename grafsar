@@ -3,24 +3,60 @@
 # Script created by rDini
 
 #:::::::::  FUNCTIONS
+if [ ! -e "/tmp/grafsar/" ] # Check if file exists.
+  then
+	mkdir /tmp/grafsar/
+        continue # On to next.
+fi
 
-Blanklines(){
-	blankblank=grep -n '^ *$' $location_sar | sed -e 's/://'
-	echo blankDone
-}
+Blank=/tmp/grafsar/blanklines
+
+
+
+############ arrays	#################################################
+<< ARRAYCOM
+arrayZ=( one two three four five five )
+
+echo
+
+# Trailing Substring Extraction
+echo ${arrayZ[@]:0}     # one two three four five five
+                        # All elements.
+
+echo ${arrayZ[@]:1}     # two three four five five
+                        # All elements following element[0].
+
+echo ${arrayZ[@]:1:2}   # two three
+                        # Only the two elements after element[0].
+-----
+echo ${#array[*]}      #  6
+                       #  Number of elements in array.
+echo ${#array[@]}      #  6
+                       #  Number of elements in array.
+-----
+ARRAYCOM
+############################################################
+
 
 MemSar(){
-	blankblank[]=$(grep -n '^ *$' $location_sar | sed -e 's/://')
-	echo $blankblank
-	line_numb=$(grep -n 'kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit' $location_sar | awk -F : '{print $1}')
-	echo $ine_numb
-	var1=$(grep -n $line_numb-1 $blankblank)
-	echo $var1
-	nextline= $(sed -n $var1+1 $blankblank)
-	echo $nextline
-	
+	line_numb=$(grep -n 'kbmemused  %memused' $location_sar | awk -F : '{print $1}')
+#	echo $line_numb
+#	echo $Blank
+	var1=$(grep -n $[$line_numb-1] $Blank| awk -F : '{print $1}')
+#	echo "line_numb -1 = " $[$line_numb-1]
+#	echo var1=$var1
+	nextline=$(sed -n $[$var1+1]p $Blank)
+#	echo $nextline
+	###  COMEÇAR DO line_numb+1 ATE nextline
+	for (( i=$[$line_numb+1]; i<$nextline ; i++))
+	do
+		echo $(sed -n $[$i-1]p $location_sar | awk '{("date --date=\""$1"\" +%T") |getline $1;print }')
+	done
 }
 
+timeconverter(){
+#	MenSar | awk '{}'
+}
 
 
 
@@ -62,6 +98,7 @@ do
       if [ -n "$2" ];
       then
         location_sar=$2
+	grep -n '^ *$' $location_sar | sed -e 's/://' > $Blank
 	echo "file is at $2"
       fi
       shift 2;;
